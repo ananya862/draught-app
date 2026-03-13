@@ -1,11 +1,41 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <script src="https://cdn.tailwindcss.com"></script>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>draught-app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary Meta -->
+    <title>Draught – Alcohol Tracker</title>
+    <meta name="description" content="Track and understand your alcohol consumption habits." />
+    <meta name="theme-color" content="#f59e0b" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Apple / iOS PWA support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Draught" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+    <!-- Splash screen background on iOS -->
+    <style>
+      html, body { background: #0a0a0a; margin: 0; padding: 0; }
+    </style>
+
+    <!-- Tailwind (keep this if you're not using a build step) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Service Worker registration -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js")
+            .then(() => console.log("Draught SW registered"))
+            .catch((err) => console.warn("SW error:", err));
+        });
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
