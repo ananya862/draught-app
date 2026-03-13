@@ -4,6 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts";
 import AddLogScreen from "./AddLogScreen";
+import { useServiceWorker } from "./useServiceWorker";
 
 // ─── Storage helpers (in-memory with localStorage-like interface via window.storage) ───
 const STORAGE_KEY = "alcohol-tracker-data";
@@ -93,6 +94,7 @@ const StatCard = ({ label, value, unit, sub, color = "amber", large }) => (
 
 // ─── Main App ───
 export default function App() {
+  const { updateAvailable, applyUpdate } = useServiceWorker();
   const [data, setData] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -212,6 +214,19 @@ export default function App() {
         .btn-press { transition: transform 0.1s; } .btn-press:active { transform: scale(0.96); }
       `}</style>
 
+      {updateAvailable && (
+        <div className="fixed bottom-4 left-4 right-4 z-50 bg-amber-500 text-zinc-900 rounded-2xl p-4 flex items-center justify-between shadow-2xl">
+          <div>
+            <p className="font-bold text-sm">Update Available</p>
+            <p className="text-xs opacity-75">New version of Draught is ready</p>
+          </div>
+          <button onClick={applyUpdate}
+            className="px-4 py-2 bg-zinc-900 text-amber-400 font-bold rounded-xl text-sm">
+            Refresh
+          </button>
+        </div>
+      )}
+      
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 fade-in">
