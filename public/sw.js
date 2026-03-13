@@ -1,31 +1,36 @@
-const CACHE_NAME = "draught-v1";
-const ASSETS = [
-  "/",
-  "/index.html",
-  "/manifest.json"
-];
+// Minimal service worker — network always first, cache only for offline
+const CACHE_NAME = "draught-v4";
 
-// Install — cache core assets
-self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-  self.skipWaiting();
+self.addEventListener("install", () => {
+  self.skipWaiting(); // activate immediately, no waiting
 });
 
-// Activate — delete old caches
 self.addEventListener("activate", (e) => {
+  // Wipe ALL old caches on every activation
   e.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      Promise.all(keys.map((key) => caches.delete(key)))
     )
   );
-  self.clients.claim();
+  self.clients.claim(); // take control of all tabs immediately
 });
 
-// Fetch — serve from cache, fall back to network
 self.addEventListener("fetch", (e) => {
+  if (e.request.method !== "GET") return;
+
+  // Always try network first — never serve stale cache as primary
   e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request))
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then((c) => c.put(e.request, copy));
+        return res;
+      })
+      .catch(() =>
+        // Only use cache when offline
+        caches.match(e.request).then(
+          (cached) => cached || caches.match("/index.html")
+        )
+      )
   );
 });
