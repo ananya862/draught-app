@@ -511,145 +511,144 @@ function LogItem({ log, onDelete, onEdit, compact }) {
 }
 
 // ─── Add Log Screen ───
-function AddLogScreen({ drinkTypes, editLog, onBack, onSave, onAddDrinkType }) {
-  const [form, setForm] = useState(editLog ? {
-    drinkType: editLog.drinkType, drinkName: editLog.drinkName || "",
-    volumeMl: editLog.volumeMl, abv: editLog.abv, time: editLog.time || "", date: editLog.date,
-  } : { drinkType: "beer", drinkName: "", volumeMl: 330, abv: 5.0, time: "", date: today() });
-  const [showNewType, setShowNewType] = useState(false);
-  const [newType, setNewType] = useState({ name: "", icon: "🍶", defaultAbv: 5 });
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-  const selType = drinkTypes.find(t => t.id === form.drinkType);
-  const preview = calcPureAlcohol(+form.volumeMl, +form.abv);
-  const stdDrinks = standardDrinks(preview);
+// function AddLogScreen({ drinkTypes, editLog, onBack, onSave, onAddDrinkType }) {
+//   const [form, setForm] = useState(editLog ? {
+//     drinkType: editLog.drinkType, drinkName: editLog.drinkName || "",
+//     volumeMl: editLog.volumeMl, abv: editLog.abv, time: editLog.time || "", date: editLog.date,
+//   } : { drinkType: "beer", drinkName: "", volumeMl: 330, abv: 5.0, time: "", date: today() });
+//   const [showNewType, setShowNewType] = useState(false);
+//   const [newType, setNewType] = useState({ name: "", icon: "🍶", defaultAbv: 5 });
+//   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+//   const selType = drinkTypes.find(t => t.id === form.drinkType);
+//   const preview = calcPureAlcohol(+form.volumeMl, +form.abv);
+//   const stdDrinks = standardDrinks(preview);
 
-  const quickVolumes = { beer: [330, 440, 568], wine: [125, 175, 250], spirits: [25, 35, 50], cocktail: [150, 200, 250], cider: [330, 440, 568], champagne: [125, 150], custom: [100, 200, 330] };
-  const vols = quickVolumes[form.drinkType] || [100, 200, 330];
+//   const quickVolumes = { beer: [330, 440, 568], wine: [125, 175, 250], spirits: [25, 35, 50], cocktail: [150, 200, 250], cider: [330, 440, 568], champagne: [125, 150], custom: [100, 200, 330] };
+//   const vols = quickVolumes[form.drinkType] || [100, 200, 330];
 
-  return (
-    <div className="slide-up p-6">
-      <button onClick={onBack} className="flex items-center gap-1.5 text-zinc-500 text-sm mb-8 hover:text-zinc-300 transition-colors">
-        <Icons.back /> Back
-      </button>
-      <h2 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800 }} className="text-2xl text-zinc-100 mb-1">
-        {editLog ? "Edit Entry" : "Log a Drink"}
-      </h2>
-      <p className="text-zinc-600 text-sm mb-6">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
+//   return (
+//     <div className="slide-up p-6">
+//       <button onClick={onBack} className="flex items-center gap-1.5 text-zinc-500 text-sm mb-8 hover:text-zinc-300 transition-colors">
+//         <Icons.back /> Back
+//       </button>
+//       <h2 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800 }} className="text-2xl text-zinc-100 mb-1">
+//         {editLog ? "Edit Entry" : "Log a Drink"}
+//       </h2>
+//       <p className="text-zinc-600 text-sm mb-6">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
 
-      {/* Drink type */}
-      <p className="text-zinc-500 text-xs uppercase tracking-widest mb-3">Drink Type</p>
-      <div className="grid grid-cols-4 gap-2 mb-6">
-        {drinkTypes.map(t => (
-          <button key={t.id} onClick={() => { set("drinkType", t.id); set("abv", t.defaultAbv); }}
-            className={`btn-press p-2.5 rounded-xl flex flex-col items-center gap-1 border transition-all text-xs ${
-              form.drinkType === t.id ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700"
-            }`}>
-            <span className="text-xl">{t.icon}</span>
-            <span>{t.name}</span>
-          </button>
-        ))}
-        <button onClick={() => setShowNewType(true)}
-          className="btn-press p-2.5 rounded-xl flex flex-col items-center gap-1 border border-dashed border-zinc-700 text-zinc-600 hover:border-zinc-600 hover:text-zinc-500 transition-all text-xs">
-          <span className="text-xl">+</span>
-          <span>Add</span>
-        </button>
-      </div>
+//       {/* Drink type */}
+//       <p className="text-zinc-500 text-xs uppercase tracking-widest mb-3">Drink Type</p>
+//       <div className="grid grid-cols-4 gap-2 mb-6">
+//         {drinkTypes.map(t => (
+//           <button key={t.id} onClick={() => { set("drinkType", t.id); set("abv", t.defaultAbv); }}
+//             className={`btn-press p-2.5 rounded-xl flex flex-col items-center gap-1 border transition-all text-xs ${
+//               form.drinkType === t.id ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700"
+//             }`}>
+//             <span className="text-xl">{t.icon}</span>
+//             <span>{t.name}</span>
+//           </button>
+//         ))}
+//         <button onClick={() => setShowNewType(true)}
+//           className="btn-press p-2.5 rounded-xl flex flex-col items-center gap-1 border border-dashed border-zinc-700 text-zinc-600 hover:border-zinc-600 hover:text-zinc-500 transition-all text-xs">
+//           <span className="text-xl">+</span>
+//           <span>Add</span>
+//         </button>
+//       </div>
 
-      {showNewType && (
-        <div className="bg-zinc-900 border border-amber-500/30 rounded-2xl p-4 mb-4 fade-in">
-          <p className="text-amber-400 text-xs font-medium mb-3">New Drink Type</p>
-          <div className="flex gap-2 mb-2">
-            <input placeholder="Icon (emoji)" value={newType.icon} onChange={e => setNewType(p => ({ ...p, icon: e.target.value }))}
-              className="w-16 bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-center text-lg outline-none" />
-            <input placeholder="Name" value={newType.name} onChange={e => setNewType(p => ({ ...p, name: e.target.value }))}
-              className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-amber-500/50" />
-            <input type="number" placeholder="ABV" value={newType.defaultAbv} onChange={e => setNewType(p => ({ ...p, defaultAbv: +e.target.value }))}
-              className="w-16 bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-sm outline-none text-center" />
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => setShowNewType(false)} className="flex-1 text-sm py-2 bg-zinc-800 rounded-xl text-zinc-500">Cancel</button>
-            <button onClick={() => {
-              if (!newType.name) return;
-              const id = newType.name.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
-              onAddDrinkType({ ...newType, id });
-              set("drinkType", id); set("abv", newType.defaultAbv);
-              setShowNewType(false);
-            }} className="flex-1 text-sm py-2 bg-amber-500 text-zinc-900 font-bold rounded-xl">Add</button>
-          </div>
-        </div>
-      )}
+//       {showNewType && (
+//         <div className="bg-zinc-900 border border-amber-500/30 rounded-2xl p-4 mb-4 fade-in">
+//           <p className="text-amber-400 text-xs font-medium mb-3">New Drink Type</p>
+//           <div className="flex gap-2 mb-2">
+//             <input placeholder="Icon (emoji)" value={newType.icon} onChange={e => setNewType(p => ({ ...p, icon: e.target.value }))}
+//               className="w-16 bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-center text-lg outline-none" />
+//             <input placeholder="Name" value={newType.name} onChange={e => setNewType(p => ({ ...p, name: e.target.value }))}
+//               className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-amber-500/50" />
+//             <input type="number" placeholder="ABV" value={newType.defaultAbv} onChange={e => setNewType(p => ({ ...p, defaultAbv: +e.target.value }))}
+//               className="w-16 bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-sm outline-none text-center" />
+//           </div>
+//           <div className="flex gap-2">
+//             <button onClick={() => setShowNewType(false)} className="flex-1 text-sm py-2 bg-zinc-800 rounded-xl text-zinc-500">Cancel</button>
+//             <button onClick={() => {
+//               if (!newType.name) return;
+//               const id = newType.name.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
+//               onAddDrinkType({ ...newType, id });
+//               set("drinkType", id); set("abv", newType.defaultAbv);
+//               setShowNewType(false);
+//             }} className="flex-1 text-sm py-2 bg-amber-500 text-zinc-900 font-bold rounded-xl">Add</button>
+//           </div>
+//         </div>
+//       )}
 
-      {/* Name */}
-      <label className="flex flex-col gap-1.5 mb-4">
-        <span className="text-zinc-500 text-xs uppercase tracking-widest">Drink Name (optional)</span>
-        <input className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60 transition-colors"
-          placeholder={`e.g. Guinness, Merlot...`} value={form.drinkName} onChange={e => set("drinkName", e.target.value)} />
-      </label>
+//       {/* Name */}
+//       <label className="flex flex-col gap-1.5 mb-4">
+//         <span className="text-zinc-500 text-xs uppercase tracking-widest">Drink Name (optional)</span>
+//         <input className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60 transition-colors"
+//           placeholder={`e.g. Guinness, Merlot...`} value={form.drinkName} onChange={e => set("drinkName", e.target.value)} />
+//       </label>
 
-      {/* Volume */}
-      <label className="flex flex-col gap-1.5 mb-2">
-        <span className="text-zinc-500 text-xs uppercase tracking-widest">Volume (ml)</span>
-        <div className="flex gap-2 mb-2">
-          {vols.map(v => (
-            <button key={v} onClick={() => set("volumeMl", v)}
-              className={`btn-press flex-1 py-2 rounded-xl text-xs border transition-all ${
-                +form.volumeMl === v ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500"
-              }`}>{v}ml</button>
-          ))}
-        </div>
-        <input type="number" className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60 transition-colors"
-          placeholder="Custom ml" value={form.volumeMl} onChange={e => set("volumeMl", +e.target.value)} />
-      </label>
+//       {/* Volume */}
+//       <label className="flex flex-col gap-1.5 mb-2">
+//         <span className="text-zinc-500 text-xs uppercase tracking-widest">Volume (ml)</span>
+//         <div className="flex gap-2 mb-2">
+//           {vols.map(v => (
+//             <button key={v} onClick={() => set("volumeMl", v)}
+//               className={`btn-press flex-1 py-2 rounded-xl text-xs border transition-all ${
+//                 +form.volumeMl === v ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500"
+//               }`}>{v}ml</button>
+//           ))}
+//         </div>
+//         <input type="number" className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60 transition-colors"
+//           placeholder="Custom ml" value={form.volumeMl} onChange={e => set("volumeMl", +e.target.value)} />
+//       </label>
 
-      {/* ABV */}
-      <label className="flex flex-col gap-1.5 mb-4">
-        <div className="flex justify-between">
-          <span className="text-zinc-500 text-xs uppercase tracking-widest">ABV %</span>
-          <span className="text-amber-400 text-xs font-medium">{form.abv}%</span>
-        </div>
-        <input type="range" min="0.5" max="70" step="0.5" value={form.abv} onChange={e => set("abv", +e.target.value)}
-          className="w-full" />
-        <input type="number" className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60 transition-colors"
-          placeholder="e.g. 5.0" value={form.abv} onChange={e => set("abv", +e.target.value)} />
-      </label>
+//       {/* ABV */}
+//       <label className="flex flex-col gap-1.5 mb-4">
+//         <div className="flex justify-between">
+//           <span className="text-zinc-500 text-xs uppercase tracking-widest">ABV %</span>
+//           <span className="text-amber-400 text-xs font-medium">{form.abv}%</span>
+//         </div>
+//         <input type="range" min="0.5" max="70" step="0.5" value={form.abv} onChange={e => set("abv", +e.target.value)}
+//           className="w-full" />
+//         <input type="number" className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60 transition-colors"
+//           placeholder="e.g. 5.0" value={form.abv} onChange={e => set("abv", +e.target.value)} />
+//       </label>
 
-      {/* Time & Date */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <label className="flex flex-col gap-1.5">
-          <span className="text-zinc-500 text-xs uppercase tracking-widest">Time</span>
-          <input type="time" className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60"
-            value={form.time} onChange={e => set("time", e.target.value)} />
-        </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-zinc-500 text-xs uppercase tracking-widest">Date</span>
-          <input type="date" className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60"
-            value={form.date} onChange={e => set("date", e.target.value)} />
-        </label>
-      </div>
+//       {/* Time & Date */}
+//       <div className="grid grid-cols-2 gap-3 mb-6">
+//         <label className="flex flex-col gap-1.5">
+//           <span className="text-zinc-500 text-xs uppercase tracking-widest">Time</span>
+//           <input type="time" className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60"
+//             value={form.time} onChange={e => set("time", e.target.value)} />
+//         </label>
+//         <label className="flex flex-col gap-1.5">
+//           <span className="text-zinc-500 text-xs uppercase tracking-widest">Date</span>
+//           <input type="date" className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500/60"
+//             value={form.date} onChange={e => set("date", e.target.value)} />
+//         </label>
+//       </div>
 
-      {/* Preview */}
-      <div className="bg-zinc-900 border border-amber-500/20 rounded-2xl p-4 mb-6">
-        <p className="text-zinc-500 text-xs uppercase tracking-widest mb-2">Calculated</p>
-        <div className="flex gap-4">
-          <div>
-            <p className="text-2xl font-black text-amber-400" style={{ fontFamily: "'Syne', sans-serif" }}>{preview.toFixed(1)}g</p>
-            <p className="text-zinc-600 text-xs">pure alcohol</p>
-          </div>
-          <div>
-            <p className="text-2xl font-black text-zinc-300" style={{ fontFamily: "'Syne', sans-serif" }}>{stdDrinks.toFixed(2)}</p>
-            <p className="text-zinc-600 text-xs">std drinks</p>
-          </div>
-        </div>
-      </div>
+//       {/* Preview */}
+//       <div className="bg-zinc-900 border border-amber-500/20 rounded-2xl p-4 mb-6">
+//         <p className="text-zinc-500 text-xs uppercase tracking-widest mb-2">Calculated</p>
+//         <div className="flex gap-4">
+//           <div>
+//             <p className="text-2xl font-black text-amber-400" style={{ fontFamily: "'Syne', sans-serif" }}>{preview.toFixed(1)}g</p>
+//             <p className="text-zinc-600 text-xs">pure alcohol</p>
+//           </div>
+//           <div>
+//             <p className="text-2xl font-black text-zinc-300" style={{ fontFamily: "'Syne', sans-serif" }}>{stdDrinks.toFixed(2)}</p>
+//             <p className="text-zinc-600 text-xs">std drinks</p>
+//           </div>
+//         </div>
+//       </div>
 
-      <button onClick={() => onSave(form)} disabled={!form.volumeMl || !form.abv}
-        className="btn-press w-full bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-900 font-bold rounded-2xl p-4 transition-all">
-        {editLog ? "Update Entry" : "Save Drink"}
-      </button>
-    </div>
-  );
-}
-
+//       <button onClick={() => onSave(form)} disabled={!form.volumeMl || !form.abv}
+//         className="btn-press w-full bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-900 font-bold rounded-2xl p-4 transition-all">
+//         {editLog ? "Update Entry" : "Save Drink"}
+//       </button>
+//     </div>
+//   );
+// }
 // ─── Analytics Screen ───
 const COLORS = ["#f59e0b", "#10b981", "#3b82f6", "#ec4899", "#8b5cf6", "#f97316", "#06b6d4"];
 
