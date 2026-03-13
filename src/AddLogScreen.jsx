@@ -1,18 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// DROP-IN REPLACEMENT: AddLogScreen with full alcohol inventory picker
-//
-// HOW TO USE:
-//   1. Copy alcoholInventory.js to your src/ folder
-//   2. Replace the existing AddLogScreen component in App.jsx with this file's
-//      contents (everything below the imports block)
-//   3. Add this import at the top of App.jsx:
-//      import { ALCOHOL_INVENTORY, searchInventory, getCategories, getSubcategories } from "./alcoholInventory";
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { useState, useMemo, useRef, useEffect } from "react";
-
-// ── Paste your alcoholInventory.js exports here OR import from the file ──────
-// (shown below as inline for single-file convenience)
 
 const ALCOHOL_INVENTORY = [
   // BEERS – Lagers
@@ -63,9 +49,9 @@ const ALCOHOL_INVENTORY = [
   { id: "santa-margherita", name: "Santa Margherita Pinot Grigio", brand: "Santa Margherita", category: "wine", subcategory: "White Wine", abv: 12.5, typicalVolumes: [125, 175, 250, 750], icon: "🥂", origin: "Italy" },
   { id: "yellowtail-chardonnay", name: "Yellow Tail Chardonnay", brand: "Yellow Tail", category: "wine", subcategory: "White Wine", abv: 13.0, typicalVolumes: [125, 175, 250, 750], icon: "🥂", origin: "Australia" },
   { id: "barefoot-pinot-grigio", name: "Barefoot Pinot Grigio", brand: "Barefoot", category: "wine", subcategory: "White Wine", abv: 12.5, typicalVolumes: [125, 175, 250, 750], icon: "🥂", origin: "USA" },
-  // Wines – Rosé & Sparkling
-  { id: "whispering-angel", name: "Whispering Angel Rosé", brand: "Château d'Esclans", category: "wine", subcategory: "Rosé", abv: 13.0, typicalVolumes: [125, 175, 250, 750], icon: "🥂", origin: "France" },
-  { id: "moet-chandon", name: "Moët & Chandon Brut", brand: "Moët & Chandon", category: "wine", subcategory: "Champagne", abv: 12.0, typicalVolumes: [125, 750], icon: "🥂", origin: "France" },
+  // Wines – Rose & Sparkling
+  { id: "whispering-angel", name: "Whispering Angel Rose", brand: "Chateau d'Esclans", category: "wine", subcategory: "Rose", abv: 13.0, typicalVolumes: [125, 175, 250, 750], icon: "🥂", origin: "France" },
+  { id: "moet-chandon", name: "Moet & Chandon Brut", brand: "Moet & Chandon", category: "wine", subcategory: "Champagne", abv: 12.0, typicalVolumes: [125, 750], icon: "🥂", origin: "France" },
   { id: "veuve-clicquot", name: "Veuve Clicquot Brut", brand: "Veuve Clicquot", category: "wine", subcategory: "Champagne", abv: 12.0, typicalVolumes: [125, 750], icon: "🥂", origin: "France" },
   { id: "prosecco-mionetto", name: "Mionetto Prosecco", brand: "Mionetto", category: "wine", subcategory: "Prosecco", abv: 11.0, typicalVolumes: [125, 200, 750], icon: "🥂", origin: "Italy" },
   // Spirits – Whiskey
@@ -96,25 +82,24 @@ const ALCOHOL_INVENTORY = [
   { id: "tanqueray", name: "Tanqueray London Dry Gin", brand: "Tanqueray", category: "spirits", subcategory: "Gin", abv: 43.1, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "UK" },
   { id: "hendricks", name: "Hendrick's Gin", brand: "Hendrick's", category: "spirits", subcategory: "Gin", abv: 44.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Scotland" },
   { id: "beefeater", name: "Beefeater London Dry", brand: "Beefeater", category: "spirits", subcategory: "Gin", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "UK" },
-  { id: "hendricks", name: "Hendrick's Gin", brand: "Hendrick's", category: "spirits", subcategory: "Gin", abv: 44.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Scotland" },
   // Spirits – Rum
-  { id: "bacardi-white", name: "Bacardí Superior White Rum", brand: "Bacardí", category: "spirits", subcategory: "Rum", abv: 37.5, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Puerto Rico" },
+  { id: "bacardi-white", name: "Bacardi Superior White Rum", brand: "Bacardi", category: "spirits", subcategory: "Rum", abv: 37.5, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Puerto Rico" },
   { id: "captain-morgan", name: "Captain Morgan Original Spiced", brand: "Captain Morgan", category: "spirits", subcategory: "Rum", abv: 35.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Jamaica" },
   { id: "malibu", name: "Malibu Coconut Rum", brand: "Malibu", category: "spirits", subcategory: "Rum", abv: 21.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Barbados" },
   { id: "havana-club-7", name: "Havana Club 7 Year", brand: "Havana Club", category: "spirits", subcategory: "Rum", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Cuba" },
-  { id: "diplomatico", name: "Diplomático Reserva Exclusiva", brand: "Diplomático", category: "spirits", subcategory: "Rum", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Venezuela" },
+  { id: "diplomatico", name: "Diplomatico Reserva Exclusiva", brand: "Diplomatico", category: "spirits", subcategory: "Rum", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Venezuela" },
   // Spirits – Tequila
-  { id: "patron-silver", name: "Patrón Silver Tequila", brand: "Patrón", category: "spirits", subcategory: "Tequila", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Mexico" },
+  { id: "patron-silver", name: "Patron Silver Tequila", brand: "Patron", category: "spirits", subcategory: "Tequila", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Mexico" },
   { id: "don-julio-blanco", name: "Don Julio Blanco", brand: "Don Julio", category: "spirits", subcategory: "Tequila", abv: 38.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Mexico" },
   { id: "jose-cuervo", name: "Jose Cuervo Especial Silver", brand: "Jose Cuervo", category: "spirits", subcategory: "Tequila", abv: 38.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Mexico" },
-  // Spirits – Cognac / Brandy
+  // Spirits – Cognac
   { id: "hennessy-vs", name: "Hennessy V.S.", brand: "Hennessy", category: "spirits", subcategory: "Cognac", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "France" },
-  { id: "remy-martin-vsop", name: "Rémy Martin VSOP", brand: "Rémy Martin", category: "spirits", subcategory: "Cognac", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "France" },
+  { id: "remy-martin-vsop", name: "Remy Martin VSOP", brand: "Remy Martin", category: "spirits", subcategory: "Cognac", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "France" },
   // Spirits – Liqueurs
   { id: "baileys", name: "Baileys Original Irish Cream", brand: "Baileys", category: "spirits", subcategory: "Liqueur", abv: 17.0, typicalVolumes: [25, 50, 100], icon: "🥃", origin: "Ireland" },
-  { id: "kahlua", name: "Kahlúa Coffee Liqueur", brand: "Kahlúa", category: "spirits", subcategory: "Liqueur", abv: 20.0, typicalVolumes: [25, 50], icon: "🥃", origin: "Mexico" },
+  { id: "kahlua", name: "Kahlua Coffee Liqueur", brand: "Kahlua", category: "spirits", subcategory: "Liqueur", abv: 20.0, typicalVolumes: [25, 50], icon: "🥃", origin: "Mexico" },
   { id: "sambuca-molinari", name: "Molinari Sambuca", brand: "Molinari", category: "spirits", subcategory: "Liqueur", abv: 40.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Italy" },
-  { id: "jagermeister", name: "Jägermeister", brand: "Jägermeister", category: "spirits", subcategory: "Liqueur", abv: 35.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Germany" },
+  { id: "jagermeister", name: "Jagermeister", brand: "Jagermeister", category: "spirits", subcategory: "Liqueur", abv: 35.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Germany" },
   { id: "aperol", name: "Aperol", brand: "Aperol", category: "spirits", subcategory: "Liqueur", abv: 11.0, typicalVolumes: [50, 75, 100], icon: "🥃", origin: "Italy" },
   { id: "campari", name: "Campari", brand: "Campari", category: "spirits", subcategory: "Liqueur", abv: 25.0, typicalVolumes: [25, 50], icon: "🥃", origin: "Italy" },
   { id: "disaronno", name: "Disaronno Originale Amaretto", brand: "Disaronno", category: "spirits", subcategory: "Liqueur", abv: 28.0, typicalVolumes: [25, 35, 50], icon: "🥃", origin: "Italy" },
@@ -123,45 +108,41 @@ const ALCOHOL_INVENTORY = [
   // RTD
   { id: "white-claw-lime", name: "White Claw Natural Lime", brand: "White Claw", category: "rtd", subcategory: "Hard Seltzer", abv: 5.0, typicalVolumes: [330, 355], icon: "🥤", origin: "USA" },
   { id: "smirnoff-ice", name: "Smirnoff Ice Original", brand: "Smirnoff", category: "rtd", subcategory: "Alcopop", abv: 4.5, typicalVolumes: [275, 330], icon: "🥤", origin: "UK" },
-  { id: "bacardi-breezer", name: "Bacardí Breezer Orange", brand: "Bacardí", category: "rtd", subcategory: "Alcopop", abv: 4.0, typicalVolumes: [275], icon: "🥤", origin: "UK" },
-  { id: "gordons-gt-can", name: "Gordon's Pink Gin & Tonic Can", brand: "Gordon's", category: "rtd", subcategory: "Pre-mixed", abv: 5.0, typicalVolumes: [250], icon: "🥤", origin: "UK" },
+  { id: "bacardi-breezer", name: "Bacardi Breezer Orange", brand: "Bacardi", category: "rtd", subcategory: "Alcopop", abv: 4.0, typicalVolumes: [275], icon: "🥤", origin: "UK" },
+  { id: "gordons-gt-can", name: "Gordon's Pink Gin and Tonic Can", brand: "Gordon's", category: "rtd", subcategory: "Pre-mixed", abv: 5.0, typicalVolumes: [250], icon: "🥤", origin: "UK" },
 ];
 
 const CATEGORY_META = {
-  beer:    { label: "Beer",    icon: "🍺", color: "amber" },
-  cider:   { label: "Cider",   icon: "🍏", color: "green" },
-  wine:    { label: "Wine",    icon: "🍷", color: "rose" },
-  spirits: { label: "Spirits", icon: "🥃", color: "orange" },
-  rtd:     { label: "RTD",     icon: "🥤", color: "sky" },
-  custom:  { label: "Custom",  icon: "🫗", color: "zinc" },
+  beer:    { label: "Beer",    icon: "🍺", color: "#f59e0b" },
+  cider:   { label: "Cider",   icon: "🍏", color: "#10b981" },
+  wine:    { label: "Wine",    icon: "🍷", color: "#fb7185" },
+  spirits: { label: "Spirits", icon: "🥃", color: "#f97316" },
+  rtd:     { label: "RTD",     icon: "🥤", color: "#38bdf8" },
+  custom:  { label: "Custom",  icon: "🫗", color: "#71717a" },
 };
 
 const calcPureAlcohol = (vol, abv) => parseFloat((vol * (abv / 100) * 0.789).toFixed(2));
 const stdDrinks = (g) => parseFloat((g / 10).toFixed(2));
 const todayStr = () => new Date().toISOString().split("T")[0];
 
-// ── Main upgraded AddLogScreen ────────────────────────────────────────────────
 export default function AddLogScreen({ editLog, onBack, onSave }) {
-  const [mode, setMode] = useState("browse"); // browse | manual
+  const [mode, setMode] = useState("browse");
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
-  const [selected, setSelected] = useState(null);     // chosen inventory item
+  const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(editLog ? {
-    volumeMl: editLog.volumeMl,
-    abv: editLog.abv,
-    time: editLog.time || "",
-    date: editLog.date,
-    drinkName: editLog.drinkName || "",
-    drinkType: editLog.drinkType,
+    volumeMl: editLog.volumeMl, abv: editLog.abv,
+    time: editLog.time || "", date: editLog.date,
+    drinkName: editLog.drinkName || "", drinkType: editLog.drinkType,
     inventoryId: editLog.inventoryId || null,
   } : {
     volumeMl: 330, abv: 5.0, time: "", date: todayStr(),
     drinkName: "", drinkType: "beer", inventoryId: null,
   });
+
   const searchRef = useRef(null);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
-  // Pre-select if editing an inventory item
   useEffect(() => {
     if (editLog?.inventoryId) {
       const item = ALCOHOL_INVENTORY.find(a => a.id === editLog.inventoryId);
@@ -184,7 +165,6 @@ export default function AddLogScreen({ editLog, onBack, onSave }) {
     return list;
   }, [search, activeCategory]);
 
-  // Group by subcategory for display
   const grouped = useMemo(() => {
     const map = {};
     filtered.forEach(item => {
@@ -205,181 +185,227 @@ export default function AddLogScreen({ editLog, onBack, onSave }) {
 
   const preview = calcPureAlcohol(+form.volumeMl, +form.abv);
 
-  const colorMap = { amber: "#f59e0b", green: "#10b981", rose: "#fb7185", orange: "#f97316", sky: "#38bdf8", zinc: "#71717a" };
-
   return (
-    <div style={{ fontFamily: "'DM Mono', monospace", background: "#0a0a0a", minHeight: "100vh" }}
+    <div style={{ fontFamily: "'DM Mono',monospace", background: "#0a0a0a", minHeight: "100vh" }}
       className="text-zinc-100 max-w-sm mx-auto">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+        * { box-sizing: border-box; }
+        input, select { background: #141414 !important; color: #e4e4e7 !important; }
+        input::placeholder { color: #52525b; }
+        input[type=range] { accent-color: #f59e0b; }
+        .add-top-bar {
+          position: sticky;
+          top: 0;
+          z-index: 40;
+          background: rgba(10,10,10,0.93);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border-bottom: 1px solid #27272a;
+          padding-top: max(14px, env(safe-area-inset-top));
+        }
+        .add-page-body {
+          padding-bottom: max(96px, calc(env(safe-area-inset-bottom) + 80px));
+        }
+        button { min-height: 36px; }
+      `}</style>
 
-      {/* Header */}
-      <div className="p-6 pb-0">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-zinc-500 text-sm mb-6 hover:text-zinc-300 transition-colors">
-          ← Back
-        </button>
-        <h2 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800 }} className="text-2xl text-zinc-100 mb-1">
-          {editLog ? "Edit Entry" : "Log a Drink"}
-        </h2>
-        <p className="text-zinc-600 text-sm mb-4">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
+      {/* Top Bar — notch-safe sticky header */}
+      <div className="add-top-bar">
+        <div className="flex items-center justify-between px-4 pb-3 pt-1">
+          {/* Back button — 44px tap target */}
+          <button
+            onClick={onBack}
+            style={{ minHeight: "44px", minWidth: "64px" }}
+            className="flex items-center gap-1 text-zinc-400 hover:text-zinc-100 transition-colors"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span className="text-sm">Back</span>
+          </button>
 
-        {/* Mode toggle */}
-        <div className="flex gap-2 bg-zinc-900 border border-zinc-800 rounded-2xl p-1 mb-5">
-          <button onClick={() => setMode("browse")}
-            className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${mode === "browse" ? "bg-amber-500 text-zinc-900" : "text-zinc-500"}`}>
-            🔍 Browse Inventory
-          </button>
-          <button onClick={() => setMode("manual")}
-            className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${mode === "manual" ? "bg-amber-500 text-zinc-900" : "text-zinc-500"}`}>
-            ✎ Enter Manually
-          </button>
+          {/* Title */}
+          <div className="flex-1 text-center">
+            <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "15px" }}
+              className="text-zinc-100 leading-tight">
+              {editLog ? "Edit Entry" : "Log a Drink"}
+            </p>
+            <p className="text-zinc-600 text-xs">
+              {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+            </p>
+          </div>
+
+          {/* Spacer to keep title centred */}
+          <div style={{ minWidth: "64px" }} />
         </div>
       </div>
 
-      {/* ── BROWSE MODE ── */}
-      {mode === "browse" && (
-        <div>
-          {/* Search */}
-          <div className="px-6 mb-3">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 text-sm">🔍</span>
-              <input
-                ref={searchRef}
-                placeholder="Search brand, type, origin..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-amber-500/60 transition-colors"
-              />
-              {search && (
-                <button onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-400">✕</button>
-              )}
-            </div>
-          </div>
+      {/* Body */}
+      <div className="add-page-body">
 
-          {/* Category filter */}
-          <div className="flex gap-2 px-6 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-            <button onClick={() => setActiveCategory("all")}
-              className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
-                activeCategory === "all" ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500"
-              }`}>All</button>
-            {Object.entries(CATEGORY_META).filter(([k]) => k !== "custom").map(([key, meta]) => (
-              <button key={key} onClick={() => setActiveCategory(key)}
-                className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
-                  activeCategory === key ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500"
-                }`}>
-                {meta.icon} {meta.label}
-              </button>
-            ))}
+        {/* Browse / Manual toggle */}
+        <div className="px-6 pt-4 pb-3">
+          <div className="flex gap-2 bg-zinc-900 border border-zinc-800 rounded-2xl p-1">
+            <button onClick={() => setMode("browse")}
+              className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${mode === "browse" ? "bg-amber-500 text-zinc-900" : "text-zinc-500"}`}>
+              Search Inventory
+            </button>
+            <button onClick={() => setMode("manual")}
+              className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${mode === "manual" ? "bg-amber-500 text-zinc-900" : "text-zinc-500"}`}>
+              Enter Manually
+            </button>
           </div>
+        </div>
 
-          {/* Selected item banner */}
-          {selected && (
-            <div className="mx-6 mb-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex items-center gap-3">
-              <span className="text-2xl">{selected.icon}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-amber-300 text-sm font-medium truncate">{selected.name}</p>
-                <p className="text-zinc-500 text-xs">{selected.abv}% ABV · {selected.origin}</p>
+        {/* BROWSE MODE */}
+        {mode === "browse" && (
+          <div>
+            {/* Search */}
+            <div className="px-6 mb-3">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 text-sm">🔍</span>
+                <input
+                  ref={searchRef}
+                  placeholder="Search brand, type, origin..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-9 py-3 text-sm outline-none focus:border-amber-500/60 transition-colors"
+                />
+                {search && (
+                  <button onClick={() => setSearch("")}
+                    style={{ minHeight: "auto" }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-400 text-lg leading-none">
+                    ×
+                  </button>
+                )}
               </div>
-              <button onClick={() => { setSelected(null); set("inventoryId", null); }}
-                className="text-zinc-600 hover:text-zinc-400 text-xs px-2 py-1 rounded-lg hover:bg-zinc-800 transition-colors">✕</button>
             </div>
-          )}
 
-          {/* Results count */}
-          <p className="px-6 text-zinc-700 text-xs mb-3">
-            {filtered.length} drink{filtered.length !== 1 ? "s" : ""} {search ? `matching "${search}"` : ""}
-          </p>
+            {/* Category pills */}
+            <div className="flex gap-2 px-6 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+              <button onClick={() => setActiveCategory("all")}
+                className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
+                  activeCategory === "all" ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500"
+                }`}>All</button>
+              {Object.entries(CATEGORY_META).filter(([k]) => k !== "custom").map(([key, meta]) => (
+                <button key={key} onClick={() => setActiveCategory(key)}
+                  className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
+                    activeCategory === key ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500"
+                  }`}>
+                  {meta.icon} {meta.label}
+                </button>
+              ))}
+            </div>
 
-          {/* List grouped by subcategory */}
-          <div className="px-6 pb-2" style={{ maxHeight: "42vh", overflowY: "auto" }}>
-            {Object.keys(grouped).length === 0 && (
-              <div className="text-center py-10 text-zinc-600 text-sm">
-                No drinks found.<br />
-                <button onClick={() => setMode("manual")} className="text-amber-500 text-xs mt-2 underline">Enter manually instead</button>
+            {/* Selected banner */}
+            {selected && (
+              <div className="mx-6 mb-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex items-center gap-3">
+                <span className="text-2xl">{selected.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-amber-300 text-sm font-medium truncate">{selected.name}</p>
+                  <p className="text-zinc-500 text-xs">{selected.abv}% ABV · {selected.origin}</p>
+                </div>
+                <button onClick={() => { setSelected(null); set("inventoryId", null); }}
+                  style={{ minHeight: "auto" }}
+                  className="text-zinc-600 hover:text-zinc-400 text-lg px-2 leading-none">×</button>
               </div>
             )}
-            {Object.entries(grouped).map(([subcat, items]) => (
-              <div key={subcat} className="mb-4">
-                <p className="text-zinc-600 text-xs uppercase tracking-widest mb-2">{subcat}</p>
-                <div className="flex flex-col gap-1.5">
-                  {items.map(item => {
-                    const isSelected = selected?.id === item.id;
-                    const catColor = colorMap[CATEGORY_META[item.category]?.color] || "#f59e0b";
-                    return (
-                      <button key={item.id} onClick={() => pickItem(item)}
-                        className={`w-full text-left px-3 py-2.5 rounded-xl border transition-all ${
-                          isSelected
-                            ? "bg-amber-500/15 border-amber-500/50"
-                            : "bg-zinc-900 border-zinc-800 hover:border-zinc-700"
-                        }`}>
-                        <div className="flex items-center gap-2.5">
-                          <span className="text-base">{item.icon}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-zinc-200 text-sm truncate">{item.name}</p>
-                            <p className="text-zinc-600 text-xs">{item.brand} · {item.origin}</p>
+
+            <p className="px-6 text-zinc-700 text-xs mb-2">
+              {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+              {search ? ` for "${search}"` : ""}
+            </p>
+
+            {/* Drink list */}
+            <div className="px-6" style={{ maxHeight: "38vh", overflowY: "auto" }}>
+              {Object.keys(grouped).length === 0 && (
+                <div className="text-center py-10 text-zinc-600 text-sm">
+                  No drinks found.
+                  <button onClick={() => setMode("manual")}
+                    style={{ minHeight: "auto" }}
+                    className="block mx-auto text-amber-500 text-xs mt-2 underline">
+                    Enter manually instead
+                  </button>
+                </div>
+              )}
+              {Object.entries(grouped).map(([subcat, items]) => (
+                <div key={subcat} className="mb-4">
+                  <p className="text-zinc-600 text-xs uppercase tracking-widest mb-2">{subcat}</p>
+                  <div className="flex flex-col gap-1.5">
+                    {items.map(item => {
+                      const isSelected = selected?.id === item.id;
+                      const catColor = CATEGORY_META[item.category]?.color || "#f59e0b";
+                      return (
+                        <button key={item.id} onClick={() => pickItem(item)}
+                          className={`w-full text-left px-3 py-2.5 rounded-xl border transition-all ${
+                            isSelected ? "bg-amber-500/15 border-amber-500/50" : "bg-zinc-900 border-zinc-800 hover:border-zinc-700"
+                          }`}>
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-base">{item.icon}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-zinc-200 text-sm truncate">{item.name}</p>
+                              <p className="text-zinc-600 text-xs">{item.brand} · {item.origin}</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <p className="font-bold text-sm" style={{ color: catColor }}>{item.abv}%</p>
+                              <p className="text-zinc-700 text-xs">{item.typicalVolumes[0]}ml+</p>
+                            </div>
+                            {isSelected && <span className="text-amber-400 text-sm">✓</span>}
                           </div>
-                          <div className="text-right shrink-0">
-                            <p className="font-bold text-sm" style={{ color: catColor }}>{item.abv}%</p>
-                            <p className="text-zinc-700 text-xs">{item.typicalVolumes[0]}ml+</p>
-                          </div>
-                          {isSelected && <span className="text-amber-400">✓</span>}
-                        </div>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Serving details — shown after selecting a drink */}
+            {selected && (
+              <div className="px-6 pt-4 border-t border-zinc-800 mt-3">
+                <p className="text-zinc-500 text-xs uppercase tracking-widest mb-3">Serving Details</p>
+
+                <p className="text-zinc-600 text-xs mb-2">Volume</p>
+                <div className="flex gap-2 mb-2 flex-wrap">
+                  {selected.typicalVolumes.map(v => (
+                    <button key={v} onClick={() => set("volumeMl", v)}
+                      className={`px-3 py-1.5 rounded-xl text-xs border transition-all ${
+                        +form.volumeMl === v ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500"
+                      }`}>{v}ml</button>
+                  ))}
+                </div>
+                <input type="number" placeholder="Custom ml"
+                  value={form.volumeMl} onChange={e => set("volumeMl", +e.target.value)}
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/60 mb-4" />
+
+                <div className="flex justify-between mb-1">
+                  <p className="text-zinc-600 text-xs">ABV %</p>
+                  <span className="text-amber-400 text-xs font-medium">{form.abv}%</span>
+                </div>
+                <input type="range" min="0.5" max="70" step="0.5" value={form.abv}
+                  onChange={e => set("abv", +e.target.value)} className="w-full mb-4" />
+
+                <div className="grid grid-cols-2 gap-3 mb-2">
+                  <label className="flex flex-col gap-1">
+                    <span className="text-zinc-600 text-xs">Time</span>
+                    <input type="time" value={form.time} onChange={e => set("time", e.target.value)}
+                      className="bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-amber-500/60" />
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-zinc-600 text-xs">Date</span>
+                    <input type="date" value={form.date} onChange={e => set("date", e.target.value)}
+                      className="bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-amber-500/60" />
+                  </label>
                 </div>
               </div>
-            ))}
+            )}
           </div>
+        )}
 
-          {/* Volume + time selectors (shown once item is selected) */}
-          {selected && (
-            <div className="px-6 pt-3 border-t border-zinc-800 mt-2">
-              <p className="text-zinc-500 text-xs uppercase tracking-widest mb-3">Serving Details</p>
-
-              {/* Volume quick picks */}
-              <p className="text-zinc-600 text-xs mb-2">Volume</p>
-              <div className="flex gap-2 mb-2 flex-wrap">
-                {selected.typicalVolumes.map(v => (
-                  <button key={v} onClick={() => set("volumeMl", v)}
-                    className={`px-3 py-1.5 rounded-xl text-xs border transition-all ${
-                      +form.volumeMl === v ? "bg-amber-500/20 border-amber-500/50 text-amber-300" : "bg-zinc-900 border-zinc-800 text-zinc-500"
-                    }`}>{v}ml</button>
-                ))}
-              </div>
-              <input type="number" placeholder="Custom ml"
-                value={form.volumeMl} onChange={e => set("volumeMl", +e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/60 mb-3" />
-
-              {/* ABV (prefilled but editable) */}
-              <div className="flex justify-between mb-1">
-                <p className="text-zinc-600 text-xs">ABV %</p>
-                <span className="text-amber-400 text-xs">{form.abv}%</span>
-              </div>
-              <input type="range" min="0.5" max="70" step="0.5" value={form.abv}
-                onChange={e => set("abv", +e.target.value)} className="w-full mb-3" />
-
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <label className="flex flex-col gap-1">
-                  <span className="text-zinc-600 text-xs">Time</span>
-                  <input type="time" value={form.time} onChange={e => set("time", e.target.value)}
-                    className="bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm outline-none focus:border-amber-500/60" />
-                </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-zinc-600 text-xs">Date</span>
-                  <input type="date" value={form.date} onChange={e => set("date", e.target.value)}
-                    className="bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm outline-none focus:border-amber-500/60" />
-                </label>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── MANUAL MODE ── */}
-      {mode === "manual" && (
-        <div className="px-6">
-          <div className="flex flex-col gap-4">
+        {/* MANUAL MODE */}
+        {mode === "manual" && (
+          <div className="px-6 flex flex-col gap-4">
             <label className="flex flex-col gap-1.5">
               <span className="text-zinc-500 text-xs uppercase tracking-widest">Drink Name</span>
               <input placeholder="e.g. House Red, Local IPA..."
@@ -411,7 +437,7 @@ export default function AddLogScreen({ editLog, onBack, onSave }) {
             <label className="flex flex-col gap-1.5">
               <div className="flex justify-between">
                 <span className="text-zinc-500 text-xs uppercase tracking-widest">ABV %</span>
-                <span className="text-amber-400 text-xs">{form.abv}%</span>
+                <span className="text-amber-400 text-xs font-medium">{form.abv}%</span>
               </div>
               <input type="range" min="0.5" max="70" step="0.5" value={form.abv}
                 onChange={e => set("abv", +e.target.value)} className="w-full" />
@@ -433,46 +459,47 @@ export default function AddLogScreen({ editLog, onBack, onSave }) {
               </label>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ── Calc preview + Save ── */}
-      <div className="px-6 pt-4 pb-8">
-        <div className="bg-zinc-900 border border-amber-500/20 rounded-2xl p-4 mb-4">
-          <p className="text-zinc-500 text-xs uppercase tracking-widest mb-2">Calculated</p>
-          <div className="flex gap-6">
-            <div>
-              <p className="text-2xl font-black text-amber-400" style={{ fontFamily: "'Syne', sans-serif" }}>{preview.toFixed(1)}g</p>
-              <p className="text-zinc-600 text-xs">pure alcohol</p>
-            </div>
-            <div>
-              <p className="text-2xl font-black text-zinc-300" style={{ fontFamily: "'Syne', sans-serif" }}>{stdDrinks(preview).toFixed(2)}</p>
-              <p className="text-zinc-600 text-xs">standard drinks</p>
+        {/* Calc preview + Save button */}
+        <div className="px-6 pt-5 pb-4">
+          <div className="bg-zinc-900 border border-amber-500/20 rounded-2xl p-4 mb-4">
+            <p className="text-zinc-500 text-xs uppercase tracking-widest mb-2">Calculated</p>
+            <div className="flex gap-6">
+              <div>
+                <p className="text-2xl font-black text-amber-400" style={{ fontFamily: "'Syne',sans-serif" }}>{preview.toFixed(1)}g</p>
+                <p className="text-zinc-600 text-xs">pure alcohol</p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-zinc-300" style={{ fontFamily: "'Syne',sans-serif" }}>{stdDrinks(preview).toFixed(2)}</p>
+                <p className="text-zinc-600 text-xs">standard drinks</p>
+              </div>
             </div>
           </div>
+
+          <button
+            onClick={() => {
+              if (!form.volumeMl || !form.abv) return;
+              onSave({
+                drinkType:   form.drinkType,
+                drinkName:   form.drinkName || selected?.name || form.drinkType,
+                volumeMl:    +form.volumeMl,
+                abv:         +form.abv,
+                time:        form.time,
+                date:        form.date,
+                inventoryId: form.inventoryId || null,
+              });
+            }}
+            disabled={!form.volumeMl || !form.abv || (mode === "browse" && !selected && !form.drinkName)}
+            className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-900 font-bold rounded-2xl p-4 transition-all text-sm">
+            {editLog ? "Update Entry" : "Save Drink"}
+          </button>
+
+          {mode === "browse" && !selected && (
+            <p className="text-center text-zinc-700 text-xs mt-3">Select a drink from the list above to continue</p>
+          )}
         </div>
 
-        <button
-          onClick={() => {
-            if (!form.volumeMl || !form.abv) return;
-            onSave({
-              drinkType: form.drinkType,
-              drinkName: form.drinkName || selected?.name || form.drinkType,
-              volumeMl: +form.volumeMl,
-              abv: +form.abv,
-              time: form.time,
-              date: form.date,
-              inventoryId: form.inventoryId || null,
-            });
-          }}
-          disabled={!form.volumeMl || !form.abv || (mode === "browse" && !selected && !form.drinkName)}
-          className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-900 font-bold rounded-2xl p-4 transition-all text-sm">
-          {editLog ? "Update Entry" : "Save Drink"}
-        </button>
-
-        {mode === "browse" && !selected && (
-          <p className="text-center text-zinc-700 text-xs mt-3">Select a drink from the list above to continue</p>
-        )}
       </div>
     </div>
   );
