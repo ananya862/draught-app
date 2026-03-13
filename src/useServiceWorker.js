@@ -32,12 +32,11 @@ export function useServiceWorker() {
       });
     });
 
-    // When SW takes control — reload to get fresh app
-    let refreshing = false;
+    // Only reload when the user explicitly clicked "Refresh"
+    // NOT on every controller change (that caused the blink loop)
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (!refreshing) {
-        refreshing = true;
-        console.log("[App] Controller changed — reloading");
+      if (sessionStorage.getItem("sw-update-pending") === "true") {
+        sessionStorage.removeItem("sw-update-pending");
         window.location.reload();
       }
     });
@@ -45,7 +44,8 @@ export function useServiceWorker() {
 
   const applyUpdate = () => {
     if (registration?.waiting) {
-      // Tell waiting SW to activate now
+      // Flag so controllerchange knows this was user-triggered
+      sessionStorage.setItem("sw-update-pending", "true");
       registration.waiting.postMessage("SKIP_WAITING");
     }
   };
