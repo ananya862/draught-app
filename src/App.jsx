@@ -3,6 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts";
+import AddLogScreen from "./AddLogScreen";
 
 // ─── Storage helpers (in-memory with localStorage-like interface via window.storage) ───
 const STORAGE_KEY = "alcohol-tracker-data";
