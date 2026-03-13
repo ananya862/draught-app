@@ -255,20 +255,6 @@ export default function App() {
         button { min-height: 36px; }
       `}</style>
 
-      {/* ── Update banner ── */}
-      {updateAvailable && (
-        <div className="fixed bottom-6 left-4 right-4 z-50 bg-amber-500 text-zinc-900 rounded-2xl p-4 flex items-center justify-between shadow-2xl fade-in">
-          <div>
-            <p className="font-bold text-sm">Update Available</p>
-            <p className="text-xs opacity-75">New version of Draught is ready</p>
-          </div>
-          <button onClick={applyUpdate}
-            className="px-4 py-2 bg-zinc-900 text-amber-400 font-bold rounded-xl text-sm">
-            Refresh
-          </button>
-        </div>
-      )}
-
       {/* ── Toast ── */}
       {toast && (
         <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 fade-in" style={{ top: "max(64px, calc(env(safe-area-inset-top) + 56px))" }}>
@@ -288,6 +274,20 @@ export default function App() {
           <TopBar />
           <div className="p-6 page-body">
             <p className="text-zinc-600 text-xs tracking-wider mb-8">alcohol awareness tracker</p>
+
+            {/* ── Update banner — home screen only ── */}
+            {updateAvailable && (
+              <div className="mb-4 bg-amber-500/15 border border-amber-500/40 rounded-2xl p-4 flex items-center justify-between fade-in">
+                <div>
+                  <p className="text-amber-300 font-bold text-sm">Update Available</p>
+                  <p className="text-amber-500/70 text-xs">New version of Draught is ready</p>
+                </div>
+                <button onClick={applyUpdate}
+                  className="px-4 py-2 bg-amber-500 text-zinc-900 font-bold rounded-xl text-sm">
+                  Refresh
+                </button>
+              </div>
+            )}
 
             <h2 className="text-zinc-400 text-xs uppercase tracking-widest mb-4 font-medium">Select Profile</h2>
 
